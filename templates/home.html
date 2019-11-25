@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>test</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css">
+  <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
+  <script src="https://code.jquery.com/jquery-3.4.1.slim.js"
+    integrity="sha256-BTlTdQO9/fascB1drekrDVkaKd9PkwBymMlHOiG+qLI=" crossorigin="anonymous"></script>
+</head>
+
+<body>
+  <section class="section">
+    <div class="container">
+      <h1 class="title">Bookmanager</h1>
+      <hr>
+      <a class="button" id="add-button">Add Book</a></td>
+
+      <div class="modal" id="modal-add">
+        <div class="modal-background"></div>
+        <div class="modal-card">
+          <header class="modal-card-head">
+            <p class="modal-card-title">Add a new book</p>
+            <button class="delete" aria-label="close" id="add-delete"></button>
+          </header>
+          <section class="modal-card-body">
+            <form method="POST" action="/">
+              <div class="field">
+                <label class="label">Title:</label>
+                <div class="control">
+                  <input class="input" type="text" placeholder="book title" name="title">
+                </div>
+              </div>
+              <div class="field">
+                <label class="label">Author:</label>
+                <div class="control">
+                  <input class="input" type="text" placeholder="author" name="author">
+                </div>
+              </div>
+              <div class="field">
+                <label class="label">Publisher:</label>
+                <div class="control">
+                  <input class="input" type="text" placeholder="publisher" name="publisher">
+                </div>
+              </div>
+              <div class="field">
+                <p class="control">
+                  <input type="submit" value="add" class="button is-success">
+                  <button class="button" id="add-close" type="button">Cancel</button>
+                </p>
+              </div>
+            </form>
+          </section>
+        </div>
+      </div>
+
+      <table class="table is-fullwidth">
+        <tr>
+          <th>Book</th>
+          <th>Author</th>
+          <th>Publisher</th>
+          <th>Action</th>
+        </tr>
+        {% for book in books %}
+        <tr>
+          <td>{{ book.title }}</td>
+          <td>{{ book.author }}</td>
+          <td>{{ book.publisher }}</td>
+          <td>
+            <div class="buttons">
+              <button class="button is-small" id="update-{{book.id}}">Update</button>
+
+              <div class="modal" id="modal-update-{{book.id}}">
+                <div class="modal-background"></div>
+                <div class="modal-card">
+                  <header class="modal-card-head">
+                    <p class="modal-card-title">Update</p>
+                    <button class="delete" id="update-{{book.id}}-delete"></button>
+                  </header>
+                  <section class="modal-card-body">
+                    <form method="POST" action="/update">
+                      <div class="field">
+                        <label class="label">Title:</label>
+                        <div class="control">
+                          <input class="input" type="hidden" name="oldtitle" value="{{book.title}}">
+                          <input class="input" type="text" placeholder="book title" name="newtitle">
+                        </div>
+                      </div>
+                      <div class="field">
+                        <label class="label">Author:</label>
+                        <div class="control">
+                          <input class="input" type="hidden" name="oldauthor" value="{{book.author}}">
+                          <input class="input" type="text" placeholder="author" name="newauthor">
+                        </div>
+                      </div>
+                      <div class="field">
+                        <label class="label">Publisher:</label>
+                        <div class="control">
+                          <input class="input" type="hidden" name="oldpublisher" value="{{book.publisher}}">
+                          <input class="input" type="text" placeholder="publisher" name="newpublisher">
+                        </div>
+                      </div>
+                      <div class="field">
+                        <p class="control">
+                          <button class="button is-success">Update</button>
+                          <button class="button" id="update-{{book.id}}-close" type="button">Cancel</button>
+                        </p>
+                      </div>
+                    </form>
+                  </section>
+                </div>
+              </div>
+
+              <button class="button is-small" id="delete-{{book.id}}">Delete</button>
+
+              <div class="modal" id="modal-delete-{{book.id}}">
+                <div class="modal-background"></div>
+                <div class="modal-card">
+                  <header class="modal-card-head">
+                    <p class="modal-card-title">Delete</p>
+                    <button class="delete" id="delete-{{book.id}}-delete"></button>
+                  </header>
+                  <section class="modal-card-body">
+                    <form method="POST" action="/delete">
+                      <div class="field">
+                        <p class="subtitle">Delete this record ?</p>
+                        <div class="control">
+                          <input class="input" type="hidden" value="{{ book.title }}" name="title">
+                        </div>
+                      </div>
+                      <div class="field">
+                        <p class="control">
+                          <button class="button is-success">Delete</button>
+                          <button class="button" id="delete-{{book.id}}-close" type="button">Cancel</button>
+                        </p>
+                      </div>
+                    </form>
+                  </section>
+                </div>
+              </div>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </table>
+    </div>
+  </section>
+  <script>
+    $("#add-button").on("click", function () {
+      $("#modal-add").addClass("is-active");
+    })
+
+    $('#add-close,#add-delete').on('click', function () {
+      $("#modal-add").removeClass("is-active");
+    })
+
+    {% for book in books %}
+    $('#update-{{book.id}}').on('click', function () {
+      $('#modal-update-{{book.id}}').addClass('is-active');
+    })
+
+    $('#update-{{book.id}}-close,#update-{{book.id}}-delete').on('click', function () {
+      $('#modal-update-{{book.id}}').removeClass('is-active');
+    })
+
+    $('#delete-{{book.id}}').on('click', function () {
+      $('#modal-delete-{{book.id}}').addClass('is-active');
+    })
+
+    $('#delete-{{book.id}}-close,#delete-{{book.id}}-delete').on('click', function () {
+      $('#modal-delete-{{book.id}}').removeClass('is-active');
+    })
+    {% endfor %}
+  </script>
+</body>
+
+</html>
